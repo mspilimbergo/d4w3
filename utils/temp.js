@@ -18,10 +18,10 @@ const intitialTagData = {
 
 export default function Home() {
     const [searchValues, setsearchValues] = useState([])
-    // const [tags, settagss] = useState({
-    //     tagArray: [],
-    //     tagMap: []
-    // })
+    const [tags, settagss] = useState({
+        tagArray: [],
+        tagMap: []
+    })
     const [state, setstate] = useState({
         tagData: {
             chain: [],
@@ -37,32 +37,29 @@ export default function Home() {
     });
     
     function updateTags({tag}) {
-        // console.log("logging tag in updatettags", tag)
         const category = tag.category;
         const tagVal = tag.value;
         const tagState = {...state.tagData};
         let currentTagMap;
-        let selectedTags = {};
+        let newTagState = {};
 
-        // if (state.tagMap === undefined) {
-        //     currentTagMap = new Map();
-        // } 
-        
+        if (state.tagMap === undefined) {
+            currentTagMap = new Map();
+            currentTagMap.set(tag.id, tag)
+        }
         // Remove tag from selected tags if it exists
         if (tagState[category].includes(tagVal)) {
-            // currentTagMap = new Map([...state.tagMap]);
             const selectedTagsInCategory = [...tagState[category]];
             const filteredTagList = selectedTagsInCategory.filter((existingTag) => existingTag !== tagVal);
-            selectedTags = {...tagState, [category]: [...filteredTagList]};
-            // currentTagMap.delete(tag.id);
+            newTagState = {...tagState, [category]: [...filteredTagList]};
+            currentTagMap.delete(tag.id);
         } // Add tag to appropriate category
         else {
-            // currentTagMap = new Map([...state.tagMap]);
             const updatedTagList = [...tagState[category], tagVal];
-            selectedTags = {...tagState, [category]: [...updatedTagList]};
-            // currentTagMap.set(tag.id, tag)
+            newTagState = {...tagState, [category]: [...updatedTagList]};
+            currentTagMap.set(tag.id, tag)
         }
-        return {selectedTags, currentTagMap};
+        return {newTagState, currentTagMap};
     }
     
     function updateTagsMap({tag}) {
@@ -91,14 +88,13 @@ export default function Home() {
     }
     
     function filterJobs(selectedTags, currentTagMap) {
-        console.log("selectedTags", selectedTags)
-        console.log("currentTagMap", currentTagMap)
+        // console.log("selectedTags", selectedTags)
+        // console.log("currentTagMap", currentTagMap)
         const initialJobList = [...state.initialJobList];
         let allEmpty = true;
         let filteredList = [];
         // Iterate through each job in the DB
         initialJobList.forEach((job) => {
-            console.log(job.tech)
             // Iterate through each filter by category (chain, sector, etc)
             for (const tagCategory in selectedTags) {
                 if (selectedTags[tagCategory].length > 0) {
@@ -108,28 +104,35 @@ export default function Home() {
                         // [tech: ["unity, python"]] jobTechTags
                         const selectedTechTags = selectedTags[tagCategory];
                         const jobTechTags = job[tagCategory];
-                        selectedTechTags.forEach(selectedTag => {                            
+                        selectedTechTags.forEach(selectedTag => {
+                            // show the item
                             if (jobTechTags.includes(selectedTag)) {
-                                filteredList.push(job)
-                                return;
-                            }
-                        });                        
-
+                                filteredList = initialJobList.filter((job) => )
+                            } else {
+                                filteredList[...]
+                            } 
+                        });
                     } else if (tagCategory === "sector") {
                         const selectedSectorTags = selectedTags[tagCategory];
                         const jobSectorTags = job[tagCategory];
                         selectedSectorTags.forEach(selectedTag => {
                             if (jobSectorTags.includes(selectedTag)) {
-                                filteredList.push(job);
-                                return;
-                            }
+                               if (!filteredList.has(job)) {
+                                    filteredList.add(job);
+                               } 
+                            } else {
+                                if (filteredList.has(job)) {
+                                    filteredList.delete(job);
+                                }
+                            } 
                         });
                     } else {
                         if (!selectedTags[tagCategory].includes(job[tagCategory])) {
-                            continue;
-
+                            if (filteredList.has(job)) {
+                                filteredList.delete(job);
+                            }
                         } else {
-                            filteredList.push(job)
+                            filteredList.add(job)
                         }
                     }
                 }                
@@ -142,48 +145,48 @@ export default function Home() {
             return {
                 ...prevState,
                 tagData: {...selectedTags},
-                filteredJobList: [...filteredList],
-                // tagArray: [...currentTagMap.values()],
-                // tagMap: currentTagMap
+                filteredJobList: [...filteredList]
             }
         })
     }
 
-    const handleSearch = newSearchTags => {  
-        // console.log("search tag array", newSearchTags)              
-        let searchResults;
-        // if (state.tagArray === undefined && newSearchTags.length > 0) {
+    // function filterJobsRefactored(tags) {
+        // const initialJobList = [...state.initialJobList];
+        // if tag array is zero, then set to initial job list
+        // go through each job list 
+            // go through the tags array
+                // for each tag item, check if the job contains the 
+    // }
+    
+    const handleSearch = newSearchTags => {        
+        let searchTagSelected = ""
         if (searchValues === undefined && newSearchTags.length > 0) {
-            searchResults = newSearchTags[0]
+            searchTagSelected = newSearchTags[0]
             setsearchValues([...newSearchTags]);
         }
         else {
-            // const tagArray = [...state.tagArray];
-            const tagArray = [...searchValues]
-            let arr1 = tagArray;
+            let arr1 = searchValues;
             let arr2 = newSearchTags; 
-            searchResults = arr1
+            searchTagSelected = arr1
             .filter(x => !arr2.includes(x))
             .concat(arr2.filter(x => !arr1.includes(x)));
             setsearchValues([...newSearchTags])
         }
-        // console.log("Search tag selected", searchResults[0]);
-        const searchTagSelected = searchResults[0];
-        handleTagClick("search", searchTagSelected)
+        console.log("Search tag selected", searchTagSelected[0]);
+        handleTagClick("search", searchTagSelected[0].category, searchTagSelected[0].value)
     }
     
     function handleTagClick(tagSource, tag) {
+        // console.log(tag)
         
         if (tagSource === "search") {
-            console.log("search tag", tag)
-            const {selectedTags, currentTagMap} = updateTags({tag});
-            console.log("selected tags from search", selectedTags);
-            filterJobs(selectedTags);        
+            const newTagState = updateTags(tag);
+            filterJobs(newTagState);        
         }
         if (tagSource === "tag") {
             // updateTagsMap(tag)
-            const {selectedTags, currentTagMap} = updateTags(tag)
-            filterJobs(selectedTags, currentTagMap);        
+            const {newTagState, currentTagMap} = updateTags(tag)
+            filterJobs(newTagState, currentTagMap);        
         }
     }
     
@@ -205,13 +208,13 @@ export default function Home() {
     useEffect(() => {
         // console.log("Current Tag List", state.tagData)    
         // console.log("Initial Jobs Fetched", state.initialJobList)        
-        console.log("Filtered Jobs List", state.filteredJobList)
-        console.log("Tag Data", state.tagData)
+        // console.log("Filtered Jobs List", state.filteredJobList)
+        // console.log("Tag Data", state.tagData)
         // console.log("Search Values", searchValues)
         // console.log("tempTagList", tempTagList)
-        console.log("Tags array: ", state.tagArray)
-        console.log("Tags map: ", state.tagMap)
-    }, [state])
+        console.log("Tags array: ", tags.tagArray)
+        console.log("Tags map: ", tags.tagMap)
+    }, [state, searchValues, tags])
 
     
     async function fetchJobs() {        
@@ -219,7 +222,7 @@ export default function Home() {
         .from('formatted_jobs')
         .select('*')
         .order('inserted_at')
-        .limit(10)
+        .limit(20)
         // .single()
 
         const {data, error} = await query;
@@ -285,7 +288,7 @@ export default function Home() {
                                         closeMenuOnSelect={true}
                                         selectedOptionStyle="check"
                                         hideSelectedOptions={false}
-                                        // value={state.tagArray}
+                                        value={tags.tagArray}
                                         onChange={handleSearch}
                                     />
                                     </FormControl>

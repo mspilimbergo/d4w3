@@ -1,0 +1,7 @@
+=== Home Page ===
+
+= Post Card = 
+[] Finish styling for desktop
+[] Finish styling for mobile 
+[] Ensure that data is formatted correctly
+[] Apply now button leads to the detail page
