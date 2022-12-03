@@ -1,39 +1,39 @@
 import { Box, Button, Container, Flex, Heading, Link } from "@chakra-ui/react";
-import supabase from '../utils/SupabaseCLient';
+// import supabase from '../utils/SupabaseCLient';
 
 export default function Header() {
 
-    async function postJob() {        
-        console.log("Posting Job");
-        const {data, error} = await supabase
-        .from('posts')
-        .insert({
-                photoUrl: "https://bit.ly/sage-adebayo",
-                title: "Full Stack Engineer",
-                organization_name: "Chancey CO",
-                chain: "Polygon",
-                sector: "ZK-PROOFS",
-                tech: "React",
-                positionType: "Part-time",
-                location: "Remote",      
-                token_compensation: true,
-                min_salary: 100000,
-                max_salary: 200000,          
-                job_description: "Markdown for job posting",
-                application_url: "https://applicationurl.coom",
-                invoice_email: "invoice email",
-                invoice_address: "2333 brickell",
-                organization_twitter: "@twittertest",
-                paid_for_logo: true,
-                logo_url: "url-to-asset",                
-                paid_bear_market_special: false,
-                paid_sticky: false,
-                sticky: "sticky-text",
-                edit_link: "some-edit-url",
-                job_post_total: 120                
-        })
-        console.log(data);
-    }
+    // async function postJob() {        
+    //     console.log("Posting Job");
+    //     const {data, error} = await supabase
+    //     .from('posts')
+    //     .insert({
+    //             photoUrl: "https://bit.ly/sage-adebayo",
+    //             title: "Full Stack Engineer",
+    //             organization_name: "Chancey CO",
+    //             chain: "Polygon",
+    //             sector: "ZK-PROOFS",
+    //             tech: "React",
+    //             positionType: "Part-time",
+    //             location: "Remote",      
+    //             token_compensation: true,
+    //             min_salary: 100000,
+    //             max_salary: 200000,          
+    //             job_description: "Markdown for job posting",
+    //             application_url: "https://applicationurl.coom",
+    //             invoice_email: "invoice email",
+    //             invoice_address: "2333 brickell",
+    //             organization_twitter: "@twittertest",
+    //             paid_for_logo: true,
+    //             logo_url: "url-to-asset",                
+    //             paid_bear_market_special: false,
+    //             paid_sticky: false,
+    //             sticky: "sticky-text",
+    //             edit_link: "some-edit-url",
+    //             job_post_total: 120                
+    //     })
+    //     console.log(data);
+    // }
     
     return (              
         <Container
