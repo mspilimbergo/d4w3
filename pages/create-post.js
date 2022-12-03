@@ -4,7 +4,7 @@ export default function CreatePost() {
     return (
         <div>
             <Container maxW={'100vw'} maxH={'100vh'} bgColor={'black'}>
-                <Container maxW={'container.lg'} p={'6'}>
+                <Container maxW={'container.xl'} p={'6'}>
                     <Grid
                     // h={'100vh'}
                     templateColumns='repeat(6, 1fr)'
@@ -13,7 +13,7 @@ export default function CreatePost() {
                         <GridItem colSpan={4} bg='black' border={'2px solid #E968F4'} backdropBlur="6px">
                             <VStack p={'4'} gap={'2'}>
                                 <Box w={'100%'}>
-                                    <Heading  textTransform={'uppercase'} color={'#D900EC'} size={'xl'} textAlign={'start'} textShadow='-1px 2px #24FF00'>
+                                    <Heading  textTransform={'uppercase'} color={'#F16DF4'} size={'2xl'} textAlign={'start'} textShadow='-1px 2px #24FF00'>
                                         Post Job
                                     </Heading>
                                 </Box>
@@ -64,7 +64,7 @@ export default function CreatePost() {
                         <GridItem colSpan={2} bg='black' border={'2px solid #B7DFB8'} boxShadow='dark-lg'>
                             <VStack p={'4'}>
                                 <Box w={'100%'}>
-                                    <Heading textAlign={'center'} textTransform={'uppercase'} color={'#D900EC'} size={'xl'} textShadow='-1px 2px #24FF00'>
+                                    <Heading textAlign={'center'} textTransform={'uppercase'} color={'#F16DF4'} size={'2xl'} textShadow='-1px 2px #24FF00'>
                                         WHY US?
                                     </Heading>
                                 </Box>                  

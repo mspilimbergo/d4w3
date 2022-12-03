@@ -5,7 +5,7 @@ const CustomTabItem = ({tag, handleTagClick}) => {
     // console.log(tag)       
     return (
         <WrapItem onChange={() => handleTagClick(source, {tag})}>
-            <Checkbox size='md' colorScheme='green'>
+            <Checkbox color={'white'} size='md' colorScheme='blackAlpha'>
                 {tag.label}
             </Checkbox>
         </WrapItem>

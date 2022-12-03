@@ -1,7 +1,35 @@
 === Home Page ===
 
+
+== Tonight's task ==
+[] change value props to come from state data for search
+[] get tagCards populating for tag select
+
+
+
+value array should come from state
+this is updated when a search term is clicked || when a tag is clicked
+so when we updatte the state, we must update the tagCards array
+tagMap will also be updated to add and remove tag
+
+
+
+if user selects item from dropdown, 
+-> that value should be added to the current tagCards array
+-> list should be filtered
+
+= Search Bar = 
+[] Values should populate on tag click. 
+[] tagData should be updated on select from search bar
+
+
 = Post Card = 
 [] Finish styling for desktop
 [] Finish styling for mobile 
 [] Ensure that data is formatted correctly
 [] Apply now button leads to the detail page
+
+lets start with the easiest solution, which would be to searrch the array for the id 
+i could have a map, and then just insert 
+we have an id, so we can search an array for an id
+or we can implemeent a 

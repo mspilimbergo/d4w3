@@ -1,8 +1,8 @@
-import { Box, Container, Flex, FormControl, Grid, GridItem, Heading, Switch, Tab, TabList, TabPanel, TabPanels, Tabs, Text, VStack, Wrap } from "@chakra-ui/react";
+import { Box, CircularProgress, Container, Flex, FormControl, Grid, GridItem, Heading, Switch, Tab, TabList, TabPanel, TabPanels, Tabs, Text, VStack, Wrap } from "@chakra-ui/react";
 import { Select } from "chakra-react-select";
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
-import JobList from "../components/Joblist";
+import JobList from '../components/JobList';
 import Taglist from "../components/Taglist";
 import { chains, groupedOptions, locations, positionTypes, sectors, techs } from '../utils/data';
 import { supabase } from "../utils/SupabaseCLient";
@@ -33,11 +33,12 @@ export default function Home() {
         filteredJobList: [],
         initialJobList: [],
         tagArray: [],
-        tagMap: []
+        tagMap: [], 
+        isLoading: true
     });
     
-    function updateTags({tag}) {
-        // console.log("logging tag in updatettags", tag)
+    function updateTags({tag}, tagArray) {
+        const tagArr = [...tagArray]
         const category = tag.category;
         const tagVal = tag.value;
         const tagState = {...state.tagData};
@@ -62,7 +63,7 @@ export default function Home() {
             selectedTags = {...tagState, [category]: [...updatedTagList]};
             // currentTagMap.set(tag.id, tag)
         }
-        return {selectedTags, currentTagMap};
+        return {selectedTags, tagArr};
     }
     
     function updateTagsMap({tag}) {
@@ -90,9 +91,10 @@ export default function Home() {
         })        
     }
     
-    function filterJobs(selectedTags, currentTagMap) {
-        console.log("selectedTags", selectedTags)
-        console.log("currentTagMap", currentTagMap)
+    function filterJobs(selectedTags, tagArr) {
+        // console.log("logging tagArr in filterjobs", tagArr)
+        // console.log("selectedTags", selectedTags)
+        // console.log("currentTagMap", currentTagMap)
         const initialJobList = [...state.initialJobList];
         let allEmpty = true;
         let filteredList = [];
@@ -143,6 +145,7 @@ export default function Home() {
                 ...prevState,
                 tagData: {...selectedTags},
                 filteredJobList: [...filteredList],
+                tagArray: [...tagArr]
                 // tagArray: [...currentTagMap.values()],
                 // tagMap: currentTagMap
             }
@@ -155,7 +158,7 @@ export default function Home() {
         // if (state.tagArray === undefined && newSearchTags.length > 0) {
         if (searchValues === undefined && newSearchTags.length > 0) {
             searchResults = newSearchTags[0]
-            setsearchValues([...newSearchTags]);
+            // setsearchValues([...newSearchTags]);
         }
         else {
             // const tagArray = [...state.tagArray];
@@ -165,20 +168,22 @@ export default function Home() {
             searchResults = arr1
             .filter(x => !arr2.includes(x))
             .concat(arr2.filter(x => !arr1.includes(x)));
-            setsearchValues([...newSearchTags])
+            // setsearchValues([...newSearchTags])
         }
-        // console.log("Search tag selected", searchResults[0]);
+        console.log("Search tag selected", searchResults[0]);
         const searchTagSelected = searchResults[0];
-        handleTagClick("search", searchTagSelected)
+        handleTagClick("search", searchTagSelected, newSearchTags)
     }
     
-    function handleTagClick(tagSource, tag) {
-        
+    function handleTagClick(tagSource, tag, tagArray) {
+        // console.log("tagArray in handleclick", tagArray);
+        // console.log(tagArray)
+
         if (tagSource === "search") {
-            console.log("search tag", tag)
-            const {selectedTags, currentTagMap} = updateTags({tag});
-            console.log("selected tags from search", selectedTags);
-            filterJobs(selectedTags);        
+            // console.log("search tag", tag)
+            // updateTags({tag}, tagArray);
+            const {selectedTags, tagArr} = updateTags({tag}, tagArray);
+            filterJobs(selectedTags, tagArr);        
         }
         if (tagSource === "tag") {
             // updateTagsMap(tag)
@@ -194,7 +199,8 @@ export default function Home() {
                 setstate({
                     tagData: intitialTagData,
                     initialJobList: data,
-                    filteredJobList: data
+                    filteredJobList: data, 
+                    isLoading: false
                 })
             // })
         }
@@ -231,13 +237,14 @@ export default function Home() {
  
   return (
     <div>
+    <Container maxW={'100vw'} bgColor={'blackAlpha.900'} h={'100%'}>
     <Container 
       maxW={'container.xl'}
-      bgColor={'blackAlpha.900'}
-      h='calc(100vh)'
+    //   bgColor={'blackAlpha.900'}
+    //   h='calc(100vh)'
     >
         <Box 
-        bgColor={'red.300'}  
+        // bgColor={'red.300'}  
         // h='calc(100vh)'
         >
             <VStack>
@@ -253,7 +260,7 @@ export default function Home() {
                 alignItems={'center'}
                 justifyContent={'center'}
                 gap={'4'}
-                bgColor={'purple.200'}
+                // bgColor={'purple.200'}
                 >
                     {/* Title and subtitle */}
                     <Box 
@@ -261,52 +268,58 @@ export default function Home() {
                     justifyContent={'center'}
                     >
                         {/* <Center> */}
-                            <Heading as={'h1'} fontSize={{base: '4xl', md: '3xl', lg: '6xl'}} >Dev Jobs For Web3</Heading>
+                        
+                            <Heading textTransform={'uppercase'} as={'h1'} fontSize={{base: '4xl', md: '3xl', lg: '7xl'}} color={'#F16DF4'} textShadow='-1px 2px #24FF00' >Dev Jobs <br/> For Web3</Heading>
                             {/* <Heading as={'h1'} fontSize={{base: '3xl', md: '3xl', lg: '6xl'}} >For Web3  </Heading> */}
                         {/* </Center> */}
                     </Box>
                     <Box  w={{base: '15rem', md: '1', lg: '100%'}} display={'flex'} justifyContent={'center'}> 
-                        <Text fontSize={{base: 'md', md: '3xl', lg: 'xl'}} textAlign={'center'}>Homeplace for Crypto and Blockchain Dev Jobs.</Text>
+                        <Text fontSize={{base: 'md', md: '3xl', lg: 'xl'}} color={'white'} textAlign={'center'}>Homepage for Blockchain and Crypto Developers</Text>
                     </Box>
                     {/* Search Bar & Remote Toggle */}
                     <Box maxW={'30rem'} >
                         <Grid
-                        templateColumns='repeat(8, 1fr)'
+                        templateColumns='repeat(10, 1fr)'
                         gap={3}
                         // h='30'
                         >
-                        <GridItem colSpan={7}>
+                        <GridItem colSpan={9}>
                             <Box >
                                 <FormControl p={4}>
                                     <Select
                                         isMulti
                                         options={groupedOptions}
-                                        placeholder="Search.."
+                                        variant={'outline'}
+                                        placeholder="Smart Contract, Full Stack, ZK, DAO..."
                                         closeMenuOnSelect={true}
                                         selectedOptionStyle="check"
                                         hideSelectedOptions={false}
                                         // value={state.tagArray}
                                         onChange={handleSearch}
+                                        color={'white'}
+                                        colorScheme={'whiteAlpha'}
+                                        useBasicStyles
                                     />
                                     </FormControl>
                             </Box> 
                         </GridItem>                   
                         <GridItem colSpan={1}> 
                             <Flex justifyContent="flex-start" alignItems={'center'} height={'100%'}>
-                                <Switch></Switch>
+                                <Switch colorScheme={'blackAlpha'} variant={'boxy'}></Switch>
                             </Flex>
                         </GridItem>
                         </Grid>
                     </Box>
                     {/* Tab List */}
                     <Box w={['xs', 'md', 'lg']}>                        
-                        <Tabs variant='unstyled' defaultIndex={0} align={'center'}  >
+                        <Tabs variant='solid-rounded' defaultIndex={0} align={'center'}  >
+                        {/* color={'#E400EC'} textShadow='-1px 2px #24FF00' */}
                             <TabList >
-                                <Tab  _selected={{ color: 'white', bg: 'blue.500' }}>Chain</Tab>
-                                <Tab  _selected={{ color: 'white', bg: 'green.400' }}>Sector</Tab>
-                                <Tab  _selected={{ color: 'white', bg: 'green.400' }}>Tech</Tab>
-                                <Tab  _selected={{ color: 'white', bg: 'green.400' }}>Job Type</Tab>
-                                <Tab  _selected={{ color: 'white', bg: 'green.400' }}>Location</Tab>
+                                <Tab  _selected={{ color: 'white', bg: '#F16DF4' }} color={'white'}>Chain</Tab>
+                                <Tab  _selected={{ color: 'white', bg: '#F16DF4' }} color={'white'}>Sector</Tab>
+                                <Tab  _selected={{ color: 'white', bg: '#F16DF4' }} color={'white'}>Tech</Tab>
+                                <Tab  _selected={{ color: 'white', bg: '#F16DF4' }} color={'white'}>Job Type</Tab>
+                                <Tab  _selected={{ color: 'white', bg: '#F16DF4' }} color={'white'}>Location</Tab>
                             </TabList>
                             <TabPanels>
                                 <TabPanel>    
@@ -341,7 +354,14 @@ export default function Home() {
                     <Box>
                         
                     </Box>
-                    {/* Multi Select Items */}                    
+                    {/* Multi Select Items */}   
+                    <Box>
+                    {
+                    state.isLoading ? 
+                    <CircularProgress isIndeterminate color='#F16DF4' /> : 
+                    <JobList jobs={state.filteredJobList}/>
+                    }
+                    </Box>                                     
                 </Flex>
                 {/* {
                     jobs.map((job) => (
@@ -396,7 +416,12 @@ export default function Home() {
             h={'full'}
             >
             {/* Job card list */}
+            {/* {
+            state.isLoading ? 
+            <CircularProgress isIndeterminate color='#B7DFB8' /> : 
             <JobList jobs={state.filteredJobList}/>
+            } */}
+            
                 {/* {jobs.map((job, index) => (
                     <PostCard 
                     key={index}
@@ -415,6 +440,7 @@ export default function Home() {
             </VStack>
 
         </Box>            
+    </Container>
     </Container>
       
       {/* Post Card List */}

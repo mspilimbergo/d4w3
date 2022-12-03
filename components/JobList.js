@@ -7,6 +7,7 @@ const JobList = ({jobs}) => (
         return(
             <PostCard 
                 key={index}
+                id={job.id}
                 jobTitle={job.job_title}
                 organizationName={job.organization_name}
                 location={job.location}
