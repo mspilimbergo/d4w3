@@ -37,33 +37,57 @@ export default function Home() {
         isLoading: true
     });
     
-    function updateTags({tag}, tagArray) {
-        const tagArr = [...tagArray]
+    function updateTags(source, {tag}, tagArray) {
+        let tagArr = []
+        if (tagArray.length !== 0) {
+            tagArr = [...tagArray]
+        }        
+        let mapIsEmpty = false;
         const category = tag.category;
         const tagVal = tag.value;
         const tagState = {...state.tagData};
         let currentTagMap;
         let selectedTags = {};
 
-        // if (state.tagMap === undefined) {
-        //     currentTagMap = new Map();
-        // } 
+        if (state.tagMap === undefined) {
+            currentTagMap = new Map();
+            mapIsEmpty = true;
+        } 
         
         // Remove tag from selected tags if it exists
         if (tagState[category].includes(tagVal)) {
-            // currentTagMap = new Map([...state.tagMap]);
-            const selectedTagsInCategory = [...tagState[category]];
-            const filteredTagList = selectedTagsInCategory.filter((existingTag) => existingTag !== tagVal);
-            selectedTags = {...tagState, [category]: [...filteredTagList]};
-            // currentTagMap.delete(tag.id);
+            if (!mapIsEmpty) {
+                currentTagMap = new Map([...state.tagMap]);
+                const selectedTagsInCategory = [...tagState[category]];
+                const removedTagList = selectedTagsInCategory.filter((existingTag) => existingTag !== tagVal);
+                selectedTags = {...tagState, [category]: [...removedTagList]};
+                currentTagMap.delete(tag.id);
+            } else {
+                const selectedTagsInCategory = [...tagState[category]];
+                const removedTagList = selectedTagsInCategory.filter((existingTag) => existingTag !== tagVal);
+                selectedTags = {...tagState, [category]: [...removedTagList]};
+            }                        
         } // Add tag to appropriate category
         else {
-            // currentTagMap = new Map([...state.tagMap]);
-            const updatedTagList = [...tagState[category], tagVal];
-            selectedTags = {...tagState, [category]: [...updatedTagList]};
-            // currentTagMap.set(tag.id, tag)
+            if (!mapIsEmpty) {
+                currentTagMap = new Map([...state.tagMap]);
+                const appendedTagList = [...tagState[category], tagVal];
+                selectedTags = {...tagState, [category]: [...appendedTagList]};
+                currentTagMap.set(tag.id, tag)
+            } else {
+                const appendedTagList = [...tagState[category], tagVal];
+                selectedTags = {...tagState, [category]: [...appendedTagList]};
+                currentTagMap.set(tag.id, tag)
+            }            
         }
-        return {selectedTags, tagArr};
+        if (source === "tag") {
+            // console.log("logging tag map in updateTags",currentTagMap)
+            tagArr = [...currentTagMap.values()]
+            return {selectedTags, tagArr, currentTagMap}
+        }
+        else {
+            return {selectedTags, tagArr};
+        }
     }
     
     function updateTagsMap({tag}) {
@@ -91,7 +115,9 @@ export default function Home() {
         })        
     }
     
-    function filterJobs(selectedTags, tagArr) {
+    function filterJobs(tagSource, selectedTags, tagArr, newTagMap) {
+        
+        // console.log("tagArr in filter jobs", tagArr)
         // console.log("logging tagArr in filterjobs", tagArr)
         // console.log("selectedTags", selectedTags)
         // console.log("currentTagMap", currentTagMap)
@@ -100,14 +126,11 @@ export default function Home() {
         let filteredList = [];
         // Iterate through each job in the DB
         initialJobList.forEach((job) => {
-            console.log(job.tech)
             // Iterate through each filter by category (chain, sector, etc)
             for (const tagCategory in selectedTags) {
                 if (selectedTags[tagCategory].length > 0) {
                     allEmpty = false;
                     if (tagCategory === "tech") {
-                        // [tech: ["node.js", "unity"]] selectedTechTags
-                        // [tech: ["unity, python"]] jobTechTags
                         const selectedTechTags = selectedTags[tagCategory];
                         const jobTechTags = job[tagCategory];
                         selectedTechTags.forEach(selectedTag => {                            
@@ -140,25 +163,39 @@ export default function Home() {
         if (allEmpty) {
             filteredList = [...initialJobList];
         }
-        setstate((prevState) => {
-            return {
-                ...prevState,
-                tagData: {...selectedTags},
-                filteredJobList: [...filteredList],
-                tagArray: [...tagArr]
-                // tagArray: [...currentTagMap.values()],
-                // tagMap: currentTagMap
-            }
-        })
+        if (tagSource === "tag") {
+            setstate((prevState) => {
+                return {
+                    ...prevState,
+                    tagData: {...selectedTags},
+                    filteredJobList: [...filteredList],
+                    tagArray: [...tagArr],
+                    tagMap: newTagMap
+                }
+            })
+        } else {
+            setstate((prevState) => {
+                return {
+                    ...prevState,
+                    tagData: {...selectedTags},
+                    filteredJobList: [...filteredList],
+                    tagArray: [...tagArr]
+                }
+            })
+        }
     }
 
     const handleSearch = newSearchTags => {  
         // console.log("search tag array", newSearchTags)              
+        if (newSearchTags.length === 0) {
+            handleTagClick("empty", "", newSearchTags)
+        }
+
         let searchResults;
         // if (state.tagArray === undefined && newSearchTags.length > 0) {
         if (searchValues === undefined && newSearchTags.length > 0) {
             searchResults = newSearchTags[0]
-            // setsearchValues([...newSearchTags]);
+            setsearchValues([...newSearchTags]);
         }
         else {
             // const tagArray = [...state.tagArray];
@@ -168,27 +205,32 @@ export default function Home() {
             searchResults = arr1
             .filter(x => !arr2.includes(x))
             .concat(arr2.filter(x => !arr1.includes(x)));
-            // setsearchValues([...newSearchTags])
+            setsearchValues([...newSearchTags])
         }
-        console.log("Search tag selected", searchResults[0]);
+        console.log("Search tag selected in search", searchResults[0]);
         const searchTagSelected = searchResults[0];
         handleTagClick("search", searchTagSelected, newSearchTags)
     }
     
-    function handleTagClick(tagSource, tag, tagArray) {
+    function handleTagClick(tagSource, tag, selectedTagsArr) {
         // console.log("tagArray in handleclick", tagArray);
-        // console.log(tagArray)
-
+        // console.log(tag)
+        // if (tagSource === "empty") {
+            
+        // }
+        
         if (tagSource === "search") {
             // console.log("search tag", tag)
             // updateTags({tag}, tagArray);
-            const {selectedTags, tagArr} = updateTags({tag}, tagArray);
-            filterJobs(selectedTags, tagArr);        
+            const {selectedTags, tagArr} = updateTags(tagSource, {tag}, selectedTagsArr);
+            filterJobs(tagSource, selectedTags, tagArr);        
         }
         if (tagSource === "tag") {
             // updateTagsMap(tag)
-            const {selectedTags, currentTagMap} = updateTags(tag)
-            filterJobs(selectedTags, currentTagMap);        
+            const {selectedTags, tagArr, currentTagMap} = updateTags(tagSource, tag, [])
+            // console.log("logging returned tag map", currentTagMap)
+            // console.log("Returned tag map", tagMap);
+            filterJobs(tagSource, selectedTags, tagArr, currentTagMap);        
         }
     }
     
@@ -294,7 +336,7 @@ export default function Home() {
                                         closeMenuOnSelect={true}
                                         selectedOptionStyle="check"
                                         hideSelectedOptions={false}
-                                        // value={state.tagArray}
+                                        value={state.tagArray}
                                         onChange={handleSearch}
                                         color={'white'}
                                         colorScheme={'whiteAlpha'}
@@ -358,7 +400,7 @@ export default function Home() {
                     <Box>
                     {
                     state.isLoading ? 
-                    <CircularProgress isIndeterminate color='#F16DF4' /> : 
+                    <CircularProgress isIndeterminate color='#F16DF4' /> :  
                     <JobList jobs={state.filteredJobList}/>
                     }
                     </Box>                                     

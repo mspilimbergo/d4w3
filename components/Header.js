@@ -1,4 +1,4 @@
-import { Box, Button, Container, Flex, Heading, Link } from "@chakra-ui/react";
+import { Box, Button, Container, Flex, Heading } from "@chakra-ui/react";
 // import supabase from '../utils/SupabaseCLient';
 
 export default function Header() {
@@ -62,9 +62,9 @@ export default function Header() {
                         <Box>
                             <Button variant={'ghost'} color={'#B7DFB8'} size={['sm','md','md']}>Web3 Whispers</Button>
                         </Box>
-                        <Link href={`/create-post`} passHref>
-                                <Button as={'a'} ml='1' variant={'outline'} color={'#B7DFB8'} border={'2px'} borderColor={"#E968F4"} size={['sm','md','md']} >APPLY</Button>
-                        </Link>                            
+                        {/* <Link href={`/create-post`}> */}
+                        <Button as={'a'} ml='1' variant={'outline'} color={'#B7DFB8'} border={'2px'} borderColor={"#E968F4"} size={['sm','md','md']} >POST JOB</Button>
+                        {/* </Link>                             */}
                         {/* <Box>
                             <Button variant={'outline'} color={'#B7DFB8'} border={'2px'} borderColor={"#E968F4"} size={['sm','md','md']} >Post Job</Button>
                         </Box> */}

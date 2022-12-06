@@ -1,6 +1,18 @@
+====TODAY==============================================================================================
 === Home Page ===
 
+= Logic =
+[] Check tags work properly
+[] Search bar should add/remove filters similar to check tag
+[] Post Job button should link to post-job page
+[] Remote Toggle button filters only remote jobs
 
+= Styling =
+[] Ensure that tag check boxes are being wrapped corretly (see sector vs tech) 
+[] General Mobile Styling
+[] PostCard Styling (tags should be white and apply link should take user to job detail page)
+
+========================================================================================================
 == Tonight's task ==
 [] change value props to come from state data for search
 [] get tagCards populating for tag select

@@ -5,8 +5,8 @@ export default function PostCard(props) {
     const maxTitleLen = 25;
     const maxOrgLen = 5;
     const jobTitleLen = props.jobTitle.length;
-    console.log("Job title", props.jobTitle)
-    console.log(jobTitleLen)
+    // console.log("Job title", props.jobTitle)
+    // console.log(jobTitleLen)
     let formattedTitle = props.jobTitle;
     if (jobTitleLen > maxTitleLen) {
         formattedTitle = props.jobTitle.substring(0, maxTitleLen)
@@ -74,7 +74,7 @@ export default function PostCard(props) {
                             <Badge mr='1' variant={'outline'} colorScheme={'whiteAlpha'}>
                                 {techString1}
                             </Badge>
-                            <Link href={`/posts/${props.id}`} passHref>
+                            <Link href={`/posts/${props.id}`}>
                                 <Button as={'a'} ml='1' variant={'outline'} color={'#B7DFB8'} border={'2px'} borderColor={"#E968F4"} size={['sm','md','md']} >APPLY</Button>
                             </Link>                            
                         </Box>                            
