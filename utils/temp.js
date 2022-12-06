@@ -1,8 +1,8 @@
-import { Box, CircularProgress, Container, Flex, FormControl, Grid, GridItem, Heading, Switch, Tab, TabList, TabPanel, TabPanels, Tabs, Text, VStack, Wrap } from "@chakra-ui/react";
+import { Box, Container, Flex, FormControl, Grid, GridItem, Heading, Switch, Tab, TabList, TabPanel, TabPanels, Tabs, Text, VStack, Wrap } from "@chakra-ui/react";
 import { Select } from "chakra-react-select";
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
-import JobList from '../components/JobList';
+import JobList from "../components/Joblist";
 import Taglist from "../components/Taglist";
 import { chains, groupedOptions, locations, positionTypes, sectors, techs } from '../utils/data';
 import { supabase } from "../utils/SupabaseCLient";
@@ -18,10 +18,10 @@ const intitialTagData = {
 
 export default function Home() {
     const [searchValues, setsearchValues] = useState([])
-    // const [tags, settagss] = useState({
-    //     tagArray: [],
-    //     tagMap: []
-    // })
+    const [tags, settagss] = useState({
+        tagArray: [],
+        tagMap: []
+    })
     const [state, setstate] = useState({
         tagData: {
             chain: [],
@@ -33,65 +33,33 @@ export default function Home() {
         filteredJobList: [],
         initialJobList: [],
         tagArray: [],
-        tagMap: [], 
-        hasTagData: false,
-        isLoading: true
+        tagMap: []
     });
     
-    function updateTags(source, {tag}, tagArray) {
-        let tagArr = []
-        if (tagArray.length !== 0) {
-            tagArr = [...tagArray]
-        }        
-        let mapIsEmpty = false;
+    function updateTags({tag}) {
         const category = tag.category;
         const tagVal = tag.value;
         const tagState = {...state.tagData};
         let currentTagMap;
-        let selectedTags = {};
+        let newTagState = {};
 
         if (state.tagMap === undefined) {
             currentTagMap = new Map();
-            mapIsEmpty = true;
-        } 
-        
+            currentTagMap.set(tag.id, tag)
+        }
         // Remove tag from selected tags if it exists
         if (tagState[category].includes(tagVal)) {
-            if (!mapIsEmpty) {
-                currentTagMap = new Map([...state.tagMap]);
-                const selectedTagsInCategory = [...tagState[category]];
-                const removedTagList = selectedTagsInCategory.filter((existingTag) => existingTag !== tagVal);
-                selectedTags = {...tagState, [category]: [...removedTagList]};
-                currentTagMap.delete(tag.id);
-            } else {
-                const selectedTagsInCategory = [...tagState[category]];
-                const removedTagList = selectedTagsInCategory.filter((existingTag) => existingTag !== tagVal);
-                selectedTags = {...tagState, [category]: [...removedTagList]};
-            }                        
+            const selectedTagsInCategory = [...tagState[category]];
+            const filteredTagList = selectedTagsInCategory.filter((existingTag) => existingTag !== tagVal);
+            newTagState = {...tagState, [category]: [...filteredTagList]};
+            currentTagMap.delete(tag.id);
         } // Add tag to appropriate category
         else {
-            if (!mapIsEmpty) {
-                currentTagMap = new Map([...state.tagMap]);
-                const appendedTagList = [...tagState[category], tagVal];
-                selectedTags = {...tagState, [category]: [...appendedTagList]};
-                currentTagMap.set(tag.id, tag)
-            } else {
-                const appendedTagList = [...tagState[category], tagVal];
-                selectedTags = {...tagState, [category]: [...appendedTagList]};
-                currentTagMap.set(tag.id, tag)
-            }            
+            const updatedTagList = [...tagState[category], tagVal];
+            newTagState = {...tagState, [category]: [...updatedTagList]};
+            currentTagMap.set(tag.id, tag)
         }
-        if (source === "tag") {
-            // console.log("logging tag map in updateTags",currentTagMap)
-            tagArr = [...currentTagMap.values()]
-            return {selectedTags, tagArr, currentTagMap}
-        }
-        else if (source === "remote") {
-            return {selectedTags}
-        }
-        else {
-            return {selectedTags, tagArr};
-        }
+        return {newTagState, currentTagMap};
     }
     
     function updateTagsMap({tag}) {
@@ -119,138 +87,106 @@ export default function Home() {
         })        
     }
     
-    function filterJobs(tagSource, selectedTags, tagArr, newTagMap) {
-        console.log("In filterJobs")
+    function filterJobs(selectedTags, currentTagMap) {
+        // console.log("selectedTags", selectedTags)
+        // console.log("currentTagMap", currentTagMap)
         const initialJobList = [...state.initialJobList];
-        let filteredList = [];
         let allEmpty = true;
-        // if (tagSource === "remote" && !state.hasTagData) {  
-        //     allEmpty = false;          
-        //     console.log("Remote filter with no tags")
-        //     initialJobList.forEach((job) => {
-        //         if (job.location === "remote") {
-        //             console.log("job with remote location", job)
-        //             filteredList.push(job)
-        //         }
-        //     })
-        // } // filter for all remote jobs with current tags
-        // else {
-            // Iterate through each job in the DB
+        let filteredList = [];
+        // Iterate through each job in the DB
         initialJobList.forEach((job) => {
-            // console.log(job.location)
             // Iterate through each filter by category (chain, sector, etc)
             for (const tagCategory in selectedTags) {
                 if (selectedTags[tagCategory].length > 0) {
                     allEmpty = false;
                     if (tagCategory === "tech") {
+                        // [tech: ["node.js", "unity"]] selectedTechTags
+                        // [tech: ["unity, python"]] jobTechTags
                         const selectedTechTags = selectedTags[tagCategory];
                         const jobTechTags = job[tagCategory];
-                        selectedTechTags.forEach(selectedTag => {                            
+                        selectedTechTags.forEach(selectedTag => {
+                            // show the item
                             if (jobTechTags.includes(selectedTag)) {
-                                filteredList.push(job)
-                                return;
-                            }
-                        });                        
-
+                                filteredList = initialJobList.filter((job) => )
+                            } else {
+                                filteredList[...]
+                            } 
+                        });
                     } else if (tagCategory === "sector") {
                         const selectedSectorTags = selectedTags[tagCategory];
                         const jobSectorTags = job[tagCategory];
                         selectedSectorTags.forEach(selectedTag => {
                             if (jobSectorTags.includes(selectedTag)) {
-                                filteredList.push(job);
-                                return;
-                            }
+                               if (!filteredList.has(job)) {
+                                    filteredList.add(job);
+                               } 
+                            } else {
+                                if (filteredList.has(job)) {
+                                    filteredList.delete(job);
+                                }
+                            } 
                         });
                     } else {
                         if (!selectedTags[tagCategory].includes(job[tagCategory])) {
-                            continue;
-
+                            if (filteredList.has(job)) {
+                                filteredList.delete(job);
+                            }
                         } else {
-                            filteredList.push(job)
+                            filteredList.add(job)
                         }
                     }
                 }                
             }
         });
-        // }
-        
         if (allEmpty) {
             filteredList = [...initialJobList];
         }
-        if (tagSource === "remote") {
-            setstate((prevState) => {
-                return {
-                    ...prevState,
-                    tagData: {...selectedTags},
-                    filteredJobList: [...filteredList],
-                }
-            })
-        }
-        else if (tagSource === "tag") {
-            setstate((prevState) => {
-                return {
-                    ...prevState,
-                    tagData: {...selectedTags},
-                    filteredJobList: [...filteredList],
-                    tagArray: [...tagArr],
-                    tagMap: newTagMap,
-                    hasTagData: true
-                }
-            })
-        } else {
-            setstate((prevState) => {
-                return {
-                    ...prevState,
-                    tagData: {...selectedTags},
-                    filteredJobList: [...filteredList],
-                    tagArray: [...tagArr],
-                    hasTagData: true
-                }
-            })
-        }
+        setstate((prevState) => {
+            return {
+                ...prevState,
+                tagData: {...selectedTags},
+                filteredJobList: [...filteredList]
+            }
+        })
     }
 
-    const handleSearch = newSearchTags => {  
-        // console.log("search tag array", newSearchTags)              
-        if (newSearchTags.length === 0) {
-            handleTagClick("empty", "", newSearchTags)
-        }
-
-        let searchResults;
-        // if (state.tagArray === undefined && newSearchTags.length > 0) {
+    // function filterJobsRefactored(tags) {
+        // const initialJobList = [...state.initialJobList];
+        // if tag array is zero, then set to initial job list
+        // go through each job list 
+            // go through the tags array
+                // for each tag item, check if the job contains the 
+    // }
+    
+    const handleSearch = newSearchTags => {        
+        let searchTagSelected = ""
         if (searchValues === undefined && newSearchTags.length > 0) {
-            searchResults = newSearchTags[0]
+            searchTagSelected = newSearchTags[0]
             setsearchValues([...newSearchTags]);
         }
         else {
-            // const tagArray = [...state.tagArray];
-            const tagArray = [...searchValues]
-            let arr1 = tagArray;
+            let arr1 = searchValues;
             let arr2 = newSearchTags; 
-            searchResults = arr1
+            searchTagSelected = arr1
             .filter(x => !arr2.includes(x))
             .concat(arr2.filter(x => !arr1.includes(x)));
             setsearchValues([...newSearchTags])
         }
-        console.log("Search tag selected in search", searchResults[0]);
-        const searchTagSelected = searchResults[0];
-        handleTagClick("search", searchTagSelected, newSearchTags)
+        console.log("Search tag selected", searchTagSelected[0]);
+        handleTagClick("search", searchTagSelected[0].category, searchTagSelected[0].value)
     }
     
-    function handleTagClick(tagSource, tag, selectedTagsArr) {
+    function handleTagClick(tagSource, tag) {
+        // console.log(tag)
         
-        if (tagSource === "remote") {
-            tag = locations[0]
-            const {selectedTags} = updateTags(tagSource, {tag}, [])
-            filterJobs(tagSource, selectedTags)
-        }
         if (tagSource === "search") {
-            const {selectedTags, tagArr} = updateTags(tagSource, {tag}, selectedTagsArr);
-            filterJobs(tagSource, selectedTags, tagArr);        
+            const newTagState = updateTags(tag);
+            filterJobs(newTagState);        
         }
         if (tagSource === "tag") {
-            const {selectedTags, tagArr, currentTagMap} = updateTags(tagSource, tag, [])
-            filterJobs(tagSource, selectedTags, tagArr, currentTagMap);        
+            // updateTagsMap(tag)
+            const {newTagState, currentTagMap} = updateTags(tag)
+            filterJobs(newTagState, currentTagMap);        
         }
     }
     
@@ -261,8 +197,7 @@ export default function Home() {
                 setstate({
                     tagData: intitialTagData,
                     initialJobList: data,
-                    filteredJobList: data, 
-                    isLoading: false
+                    filteredJobList: data
                 })
             // })
         }
@@ -273,22 +208,21 @@ export default function Home() {
     useEffect(() => {
         // console.log("Current Tag List", state.tagData)    
         // console.log("Initial Jobs Fetched", state.initialJobList)        
-        console.log("Filtered Jobs List", state.filteredJobList)
-        console.log("Tag Data", state.tagData)
+        // console.log("Filtered Jobs List", state.filteredJobList)
+        // console.log("Tag Data", state.tagData)
         // console.log("Search Values", searchValues)
         // console.log("tempTagList", tempTagList)
-        console.log("Tags array: ", state.tagArray)
-        console.log("Tags map: ", state.tagMap)
-    }, [state])
+        console.log("Tags array: ", tags.tagArray)
+        console.log("Tags map: ", tags.tagMap)
+    }, [state, searchValues, tags])
 
     
     async function fetchJobs() {        
         let query = supabase
         .from('formatted_jobs')
-        .select()
-        // .eq('location', 'remote')
-        .order('inserted_at', {ascending: true})
-        .limit(10)
+        .select('*')
+        .order('inserted_at')
+        .limit(20)
         // .single()
 
         const {data, error} = await query;
@@ -300,14 +234,13 @@ export default function Home() {
  
   return (
     <div>
-    <Container maxW={'100vw'} bgColor={'blackAlpha.900'} h={'100%'}>
     <Container 
       maxW={'container.xl'}
-    //   bgColor={'blackAlpha.900'}
-    //   h='calc(100vh)'
+      bgColor={'blackAlpha.900'}
+      h='calc(100vh)'
     >
         <Box 
-        // bgColor={'red.300'}  
+        bgColor={'red.300'}  
         // h='calc(100vh)'
         >
             <VStack>
@@ -323,7 +256,7 @@ export default function Home() {
                 alignItems={'center'}
                 justifyContent={'center'}
                 gap={'4'}
-                // bgColor={'purple.200'}
+                bgColor={'purple.200'}
                 >
                     {/* Title and subtitle */}
                     <Box 
@@ -331,61 +264,52 @@ export default function Home() {
                     justifyContent={'center'}
                     >
                         {/* <Center> */}
-                        
-                            <Heading textTransform={'uppercase'} as={'h1'} fontSize={{base: '4xl', md: '3xl', lg: '7xl'}} color={'#F16DF4'} textShadow='-1px 2px #24FF00' >Dev Jobs <br/> For Web3</Heading>
+                            <Heading as={'h1'} fontSize={{base: '4xl', md: '3xl', lg: '6xl'}} >Dev Jobs For Web3</Heading>
                             {/* <Heading as={'h1'} fontSize={{base: '3xl', md: '3xl', lg: '6xl'}} >For Web3  </Heading> */}
                         {/* </Center> */}
                     </Box>
                     <Box  w={{base: '15rem', md: '1', lg: '100%'}} display={'flex'} justifyContent={'center'}> 
-                        <Text fontSize={{base: 'md', md: '3xl', lg: 'xl'}} color={'white'} textAlign={'center'}>Homepage for Blockchain and Crypto Developers</Text>
+                        <Text fontSize={{base: 'md', md: '3xl', lg: 'xl'}} textAlign={'center'}>Homeplace for Crypto and Blockchain Dev Jobs.</Text>
                     </Box>
                     {/* Search Bar & Remote Toggle */}
-                    <Box maxW={'34rem'} 
-                    // bgColor={"gray"}
-                    >
+                    <Box maxW={'30rem'} >
                         <Grid
-                        templateColumns='repeat(14, 1fr)'
-                        // gap={0}
+                        templateColumns='repeat(8, 1fr)'
+                        gap={3}
                         // h='30'
                         >
-                        <GridItem colSpan={12}>
+                        <GridItem colSpan={7}>
                             <Box >
-                                <FormControl p={10}>
+                                <FormControl p={4}>
                                     <Select
                                         isMulti
                                         options={groupedOptions}
-                                        variant={'outline'}
-                                        placeholder="Smart Contract, Full Stack, ZK, DAO..."
+                                        placeholder="Search.."
                                         closeMenuOnSelect={true}
                                         selectedOptionStyle="check"
                                         hideSelectedOptions={false}
-                                        value={state.tagArray}
+                                        value={tags.tagArray}
                                         onChange={handleSearch}
-                                        color={'white'}
-                                        colorScheme={'whiteAlpha'}
-                                        useBasicStyles
                                     />
                                     </FormControl>
                             </Box> 
                         </GridItem>                   
-                        <GridItem colSpan={2}> 
-                            <Flex gap={'3'} justifyContent="flex-start"alignItems={'center'} height={'100%'}>
-                                <Switch colorScheme={'blackAlpha'} variant={'boxy'} onChange={() => handleTagClick("remote")}></Switch>
-                                <Text fontSize={'sm'} color={'white'}>REMOTE</Text>
+                        <GridItem colSpan={1}> 
+                            <Flex justifyContent="flex-start" alignItems={'center'} height={'100%'}>
+                                <Switch></Switch>
                             </Flex>
                         </GridItem>
                         </Grid>
                     </Box>
                     {/* Tab List */}
                     <Box w={['xs', 'md', 'lg']}>                        
-                        <Tabs variant='solid-rounded' defaultIndex={0} align={'center'}  >
-                        {/* color={'#E400EC'} textShadow='-1px 2px #24FF00' */}
+                        <Tabs variant='unstyled' defaultIndex={0} align={'center'}  >
                             <TabList >
-                                <Tab  _selected={{ color: 'white', bg: '#F16DF4' }} color={'white'}>Chain</Tab>
-                                <Tab  _selected={{ color: 'white', bg: '#F16DF4' }} color={'white'}>Sector</Tab>
-                                <Tab  _selected={{ color: 'white', bg: '#F16DF4' }} color={'white'}>Tech</Tab>
-                                <Tab  _selected={{ color: 'white', bg: '#F16DF4' }} color={'white'}>Job Type</Tab>
-                                <Tab  _selected={{ color: 'white', bg: '#F16DF4' }} color={'white'}>Location</Tab>
+                                <Tab  _selected={{ color: 'white', bg: 'blue.500' }}>Chain</Tab>
+                                <Tab  _selected={{ color: 'white', bg: 'green.400' }}>Sector</Tab>
+                                <Tab  _selected={{ color: 'white', bg: 'green.400' }}>Tech</Tab>
+                                <Tab  _selected={{ color: 'white', bg: 'green.400' }}>Job Type</Tab>
+                                <Tab  _selected={{ color: 'white', bg: 'green.400' }}>Location</Tab>
                             </TabList>
                             <TabPanels>
                                 <TabPanel>    
@@ -420,14 +344,7 @@ export default function Home() {
                     <Box>
                         
                     </Box>
-                    {/* Multi Select Items */}   
-                    <Box>
-                    {
-                    state.isLoading ? 
-                    <CircularProgress isIndeterminate color='#F16DF4' /> :  
-                    <JobList jobs={state.filteredJobList}/>
-                    }
-                    </Box>                                     
+                    {/* Multi Select Items */}                    
                 </Flex>
                 {/* {
                     jobs.map((job) => (
@@ -482,12 +399,7 @@ export default function Home() {
             h={'full'}
             >
             {/* Job card list */}
-            {/* {
-            state.isLoading ? 
-            <CircularProgress isIndeterminate color='#B7DFB8' /> : 
             <JobList jobs={state.filteredJobList}/>
-            } */}
-            
                 {/* {jobs.map((job, index) => (
                     <PostCard 
                     key={index}
@@ -506,7 +418,6 @@ export default function Home() {
             </VStack>
 
         </Box>            
-    </Container>
     </Container>
       
       {/* Post Card List */}
