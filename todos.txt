@@ -2,10 +2,11 @@
 === Home Page ===
 
 = Logic =
-[] Check tags work properly
-[] Search bar should add/remove filters similar to check tag
-[] Post Job button should link to post-job page
+[x] Check tags work properly
+[x] Search bar should add/remove filters similar to check tag
 [] Remote Toggle button filters only remote jobs
+[] Post Job button should link to post-job page
+pending-> [] Tag box should be selected when same value is clicked in the search field
 
 = Styling =
 [] Ensure that tag check boxes are being wrapped corretly (see sector vs tech) 

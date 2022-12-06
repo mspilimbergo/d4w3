@@ -34,6 +34,7 @@ export default function Home() {
         initialJobList: [],
         tagArray: [],
         tagMap: [], 
+        hasTagData: false,
         isLoading: true
     });
     
@@ -85,6 +86,9 @@ export default function Home() {
             tagArr = [...currentTagMap.values()]
             return {selectedTags, tagArr, currentTagMap}
         }
+        else if (source === "remote") {
+            return {selectedTags}
+        }
         else {
             return {selectedTags, tagArr};
         }
@@ -116,16 +120,24 @@ export default function Home() {
     }
     
     function filterJobs(tagSource, selectedTags, tagArr, newTagMap) {
-        
-        // console.log("tagArr in filter jobs", tagArr)
-        // console.log("logging tagArr in filterjobs", tagArr)
-        // console.log("selectedTags", selectedTags)
-        // console.log("currentTagMap", currentTagMap)
+        console.log("In filterJobs")
         const initialJobList = [...state.initialJobList];
-        let allEmpty = true;
         let filteredList = [];
-        // Iterate through each job in the DB
+        let allEmpty = true;
+        // if (tagSource === "remote" && !state.hasTagData) {  
+        //     allEmpty = false;          
+        //     console.log("Remote filter with no tags")
+        //     initialJobList.forEach((job) => {
+        //         if (job.location === "remote") {
+        //             console.log("job with remote location", job)
+        //             filteredList.push(job)
+        //         }
+        //     })
+        // } // filter for all remote jobs with current tags
+        // else {
+            // Iterate through each job in the DB
         initialJobList.forEach((job) => {
+            // console.log(job.location)
             // Iterate through each filter by category (chain, sector, etc)
             for (const tagCategory in selectedTags) {
                 if (selectedTags[tagCategory].length > 0) {
@@ -160,17 +172,29 @@ export default function Home() {
                 }                
             }
         });
+        // }
+        
         if (allEmpty) {
             filteredList = [...initialJobList];
         }
-        if (tagSource === "tag") {
+        if (tagSource === "remote") {
+            setstate((prevState) => {
+                return {
+                    ...prevState,
+                    tagData: {...selectedTags},
+                    filteredJobList: [...filteredList],
+                }
+            })
+        }
+        else if (tagSource === "tag") {
             setstate((prevState) => {
                 return {
                     ...prevState,
                     tagData: {...selectedTags},
                     filteredJobList: [...filteredList],
                     tagArray: [...tagArr],
-                    tagMap: newTagMap
+                    tagMap: newTagMap,
+                    hasTagData: true
                 }
             })
         } else {
@@ -179,7 +203,8 @@ export default function Home() {
                     ...prevState,
                     tagData: {...selectedTags},
                     filteredJobList: [...filteredList],
-                    tagArray: [...tagArr]
+                    tagArray: [...tagArr],
+                    hasTagData: true
                 }
             })
         }
@@ -213,23 +238,18 @@ export default function Home() {
     }
     
     function handleTagClick(tagSource, tag, selectedTagsArr) {
-        // console.log("tagArray in handleclick", tagArray);
-        // console.log(tag)
-        // if (tagSource === "empty") {
-            
-        // }
         
+        if (tagSource === "remote") {
+            tag = locations[0]
+            const {selectedTags} = updateTags(tagSource, {tag}, [])
+            filterJobs(tagSource, selectedTags)
+        }
         if (tagSource === "search") {
-            // console.log("search tag", tag)
-            // updateTags({tag}, tagArray);
             const {selectedTags, tagArr} = updateTags(tagSource, {tag}, selectedTagsArr);
             filterJobs(tagSource, selectedTags, tagArr);        
         }
         if (tagSource === "tag") {
-            // updateTagsMap(tag)
             const {selectedTags, tagArr, currentTagMap} = updateTags(tagSource, tag, [])
-            // console.log("logging returned tag map", currentTagMap)
-            // console.log("Returned tag map", tagMap);
             filterJobs(tagSource, selectedTags, tagArr, currentTagMap);        
         }
     }
@@ -265,8 +285,9 @@ export default function Home() {
     async function fetchJobs() {        
         let query = supabase
         .from('formatted_jobs')
-        .select('*')
-        .order('inserted_at')
+        .select()
+        // .eq('location', 'remote')
+        .order('inserted_at', {ascending: true})
         .limit(10)
         // .single()
 
@@ -319,15 +340,17 @@ export default function Home() {
                         <Text fontSize={{base: 'md', md: '3xl', lg: 'xl'}} color={'white'} textAlign={'center'}>Homepage for Blockchain and Crypto Developers</Text>
                     </Box>
                     {/* Search Bar & Remote Toggle */}
-                    <Box maxW={'30rem'} >
+                    <Box maxW={'34rem'} 
+                    // bgColor={"gray"}
+                    >
                         <Grid
-                        templateColumns='repeat(10, 1fr)'
-                        gap={3}
+                        templateColumns='repeat(14, 1fr)'
+                        // gap={0}
                         // h='30'
                         >
-                        <GridItem colSpan={9}>
+                        <GridItem colSpan={12}>
                             <Box >
-                                <FormControl p={4}>
+                                <FormControl p={10}>
                                     <Select
                                         isMulti
                                         options={groupedOptions}
@@ -345,9 +368,10 @@ export default function Home() {
                                     </FormControl>
                             </Box> 
                         </GridItem>                   
-                        <GridItem colSpan={1}> 
-                            <Flex justifyContent="flex-start" alignItems={'center'} height={'100%'}>
-                                <Switch colorScheme={'blackAlpha'} variant={'boxy'}></Switch>
+                        <GridItem colSpan={2}> 
+                            <Flex gap={'3'} justifyContent="flex-start"alignItems={'center'} height={'100%'}>
+                                <Switch colorScheme={'blackAlpha'} variant={'boxy'} onChange={() => handleTagClick("remote")}></Switch>
+                                <Text fontSize={'sm'} color={'white'}>REMOTE</Text>
                             </Flex>
                         </GridItem>
                         </Grid>

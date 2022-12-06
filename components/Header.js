@@ -60,7 +60,7 @@ export default function Header() {
                     </Box>
                     <Flex gap={'2'}>
                         <Box>
-                            <Button variant={'ghost'} color={'#B7DFB8'} size={['sm','md','md']}>Web3 Whispers</Button>
+                            <Button variant={'ghost'} color={'#B7DFB8'} size={['sm','md','md']}>WHISPERS</Button>
                         </Box>
                         {/* <Link href={`/create-post`}> */}
                         <Button as={'a'} ml='1' variant={'outline'} color={'#B7DFB8'} border={'2px'} borderColor={"#E968F4"} size={['sm','md','md']} >POST JOB</Button>
