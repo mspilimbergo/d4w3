@@ -2,10 +2,10 @@ import { Box, CircularProgress, Container, Flex, FormControl, Grid, GridItem, He
 import { Select } from "chakra-react-select";
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
-import JobList from '../components/JobList';
+import JobList from "../components/JobList";
 import Taglist from "../components/Taglist";
-import { chains, groupedOptions, locations, positionTypes, sectors, techs } from '../utils/data';
 import { supabase } from "../utils/SupabaseCLient";
+import { chains, groupedOptions, locations, positionTypes, sectors, techs } from '../utils/data';
 
 
 const intitialTagData = {
@@ -295,7 +295,7 @@ export default function Home() {
         if (!error) {
             return data;   
         }
-        // console.log("logging data response", data);
+        console.log("logging data response", data);
     }
  
   return (
@@ -332,7 +332,7 @@ export default function Home() {
                     >
                         {/* <Center> */}
                         
-                            <Heading textTransform={'uppercase'} as={'h1'} fontSize={{base: '4xl', md: '3xl', lg: '7xl'}} color={'#F16DF4'} textShadow='-1px 2px #24FF00' >Dev Jobs <br/> For Web3</Heading>
+                            <Heading textTransform={'uppercase'} as={'h1'} fontSize={{base: '6xl', md: '3xl', lg: '8xl'}} color={'#F16DF4'} textShadow='-1px 2px #24FF00' >Dev Jobs <br/> For Web3</Heading>
                             {/* <Heading as={'h1'} fontSize={{base: '3xl', md: '3xl', lg: '6xl'}} >For Web3  </Heading> */}
                         {/* </Center> */}
                     </Box>
@@ -370,7 +370,7 @@ export default function Home() {
                         </GridItem>                   
                         <GridItem colSpan={2}> 
                             <Flex gap={'3'} justifyContent="flex-start"alignItems={'center'} height={'100%'}>
-                                <Switch colorScheme={'blackAlpha'} variant={'boxy'} onChange={() => handleTagClick("remote")}></Switch>
+                                <Switch colorScheme={'light-green'} color={'blue'} variant={'boxy'} onChange={() => handleTagClick("remote")}></Switch>
                                 <Text fontSize={'sm'} color={'white'}>REMOTE</Text>
                             </Flex>
                         </GridItem>
@@ -422,12 +422,12 @@ export default function Home() {
                     </Box>
                     {/* Multi Select Items */}   
                     <Box>
-                    {
-                    state.isLoading ? 
-                    <CircularProgress isIndeterminate color='#F16DF4' /> :  
-                    <JobList jobs={state.filteredJobList}/>
-                    }
-                    </Box>                                     
+                            {
+                            state.isLoading ? 
+                            <CircularProgress isIndeterminate color='#F16DF4' /> :  
+                            <JobList jobs={state.filteredJobList}/>
+                            }
+                    </Box>                                                 
                 </Flex>
                 {/* {
                     jobs.map((job) => (

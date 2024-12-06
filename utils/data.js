@@ -14,6 +14,7 @@ export const chains = [
     {id: 12, value: "algorand", label: "algorand", category: "chain"},
     {id: 13, value: "telos", label: "telos", category: "chain"},
 ]
+
 export const sectors = [
     {id: 14, value: "saas", label: "SaaS", category: "sector"},
     {id: 15, value: "analytics", label: "Analytics", category: "sector"},
@@ -95,6 +96,13 @@ export const locations = [
     {id: 85, value: "newyork,ny", label: "New York, NY", category: "location" },
     {id: 86, value: "sanfrancisco,ca", label: "San Francisco, CA", category: "location" },
     ]
+
+export const chainsOptions = [
+    {
+        label: "Chains", 
+        options: chains
+    }
+]    
 
 export const groupedOptions = [
     {
